@@ -8,9 +8,8 @@ import 'gun/lib/rindexed'; // required for IndexedDB + RAD
 
 const gun = Gun({ 
   peers: [
-    'https://toplocs.com/gun',       // Main Tribelike relay
-    'https://gunjs.herokuapp.com/gun', // Public Gun relay (fallback)
-    'http://localhost:3000/gun'      // Local development (last fallback)
+    'https://toplocs.com/gun'        // Main Tribelike relay
+    // 'http://localhost:3000/gun'   // Local development (uncomment for local dev)
   ], 
   rad: true 
 });
