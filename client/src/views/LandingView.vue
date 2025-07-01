@@ -20,7 +20,7 @@
 <script setup lang="ts">
 import Container from '@/components/common/Container.vue';
 import Banner from '@/components/common/Banner.vue';
-import SphereCloud from '@/components/sphereCloud.vue';
+import SphereCloud from '@/components/SphereCloud.vue';
 import { useProfile } from '@/composables/profileProvider';
 import gun from '@/services/gun';
 
