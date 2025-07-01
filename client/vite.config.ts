@@ -24,6 +24,6 @@ export default defineConfig({
   },
   build: {
     target: 'esnext',
-    outDir: '../clean/dist/views'
+    outDir: '../server/dist/views'
   },
 });

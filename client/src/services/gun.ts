@@ -6,7 +6,14 @@ import 'gun/lib/radisk'; // optional: if you're using radisk storage
 import 'gun/lib/store'; // optional: if using indexed storage
 import 'gun/lib/rindexed'; // required for IndexedDB + RAD
 
-const gun = Gun({ peers: ['http://localhost:3000/gun'], rad: true });
+const gun = Gun({ 
+  peers: [
+    'http://localhost:3000/gun',     // Local development
+    'https://toplocs.com/gun',       // Main Tribelike relay
+    'https://gunjs.herokuapp.com/gun' // Public Gun relay (fallback)
+  ], 
+  rad: true 
+});
 
 gun.clear = function() {
 	// Clear localStorage
