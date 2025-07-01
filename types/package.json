@@ -3,6 +3,16 @@
     "private": true,
     "version": "1.0.0",
     "description": "Shared types",
+    "main": "./index.ts",
+    "types": "./index.ts",
+    "exports": {
+        ".": "./index.ts",
+        "./user": "./User.ts",
+        "./*": "./*.ts"
+    },
+    "scripts": {
+        "build-only": "echo 'TypeScript types - no build needed'"
+    },
     "devDependencies": {
         "@types/uuid": "^10.0.0",
         "typescript": "^5.8.2"
