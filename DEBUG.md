@@ -6,9 +6,23 @@
 Just run `pnpm dev` - all debug tools are automatically enabled!
 
 ### Production (tribelike.shniq.dev)
-Add `?debug=true` to the URL:
+
+**Full debug** (all logs):
 ```
 https://tribelike.shniq.dev?debug=true
+```
+
+**Filtered debug** (only specific types):
+```
+https://tribelike.shniq.dev?debug=peer          # Only peer connections
+https://tribelike.shniq.dev?debug=get           # Only GET operations
+https://tribelike.shniq.dev?debug=subscribe     # Only subscriptions
+https://tribelike.shniq.dev?debug=get,peer      # Multiple types
+```
+
+**Quiet mode** (no console hints):
+```
+https://tribelike.shniq.dev?debug=true&quiet    # Debug without hints
 ```
 
 ## Available Tools

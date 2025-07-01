@@ -9,16 +9,20 @@ import OpenLayersMap from 'vue3-openlayers';
 import VueDnDKitPlugin from '@vue-dnd-kit/core';
 
 // Debug mode activation (?debug=true works in production!)
-const debugMode = import.meta.env.DEV || new URLSearchParams(location.search).has('debug');
+const params = new URLSearchParams(location.search);
+const debugMode = import.meta.env.DEV || params.has('debug');
+const quietMode = params.has('quiet');
 
 if (debugMode) {
   // Load Gun.js Logger
   import('./utils/gunLogger').then(({ default: gunLogger }) => {
-    console.log('Gun Logger loaded. Available commands:');
-    console.log('- gunStats()     // Show statistics');
-    console.log('- gunRecent()    // Show recent activity');
-    console.log('- gunClear()     // Clear logs');
-    console.log('- gunLog         // Full logger object');
+    if (!quietMode) {
+      console.log('Gun Logger loaded. Available commands:');
+      console.log('- gunStats()     // Show statistics');
+      console.log('- gunRecent()    // Show recent activity');
+      console.log('- gunClear()     // Clear logs');
+      console.log('- gunLog         // Full logger object');
+    }
   });
   
   // Load Eruda (mobile-style console)
@@ -40,8 +44,10 @@ if (debugMode) {
     eruda.hide();
     
     // Show hint
-    console.log('%c📱 Eruda Console loaded! Click the floating button to open.', 
-      'color: #9C27B0; font-weight: bold');
+    if (!quietMode) {
+      console.log('%c📱 Eruda Console loaded! Click the floating button to open.', 
+        'color: #9C27B0; font-weight: bold');
+    }
   });
 }
 

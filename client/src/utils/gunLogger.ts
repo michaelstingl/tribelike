@@ -12,14 +12,26 @@ class GunLogger {
   private events: GunEvent[] = [];
   private maxEvents = 100;
   private enabled = false;
+  private filterTypes?: string[];
   
   constructor() {
+    const params = new URLSearchParams(location.search);
+    
     // Enable for dev or with ?debug=true
-    this.enabled = import.meta.env.DEV || new URLSearchParams(location.search).has('debug');
+    this.enabled = import.meta.env.DEV || params.has('debug');
     
     if (!this.enabled) return;
     
-    console.log('%c🔫 Gun Logger Activated', 'color: #4CAF50; font-weight: bold');
+    // Check for debug filters
+    const debugFilter = params.get('debug');
+    if (debugFilter && debugFilter !== 'true') {
+      // Filter by type: ?debug=peer or ?debug=get,subscribe
+      const allowedTypes = debugFilter.toLowerCase().split(',');
+      this.filterTypes = allowedTypes;
+      console.log(`%c🔫 Gun Logger Activated (filtering: ${allowedTypes.join(', ')})`, 'color: #4CAF50; font-weight: bold');
+    } else {
+      console.log('%c🔫 Gun Logger Activated', 'color: #4CAF50; font-weight: bold');
+    }
     
     // Intercept Gun operations
     this.interceptGunMethods();
@@ -74,6 +86,11 @@ class GunLogger {
   
   private log(type: string, path: string, meta: any) {
     if (!this.enabled) return;
+    
+    // Apply filter if set
+    if (this.filterTypes && !this.filterTypes.includes(type.toLowerCase())) {
+      return;
+    }
     
     const event: GunEvent = { 
       type, 
