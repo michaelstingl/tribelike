@@ -7,9 +7,14 @@ Just run `pnpm dev` - all debug tools are automatically enabled!
 
 ### Production (tribelike.shniq.dev)
 
-**Full debug** (all logs):
+**Basic debug** (Gun logger only, no Eruda):
 ```
 https://tribelike.shniq.dev?debug=true
+```
+
+**With Eruda** (mobile console):
+```
+https://tribelike.shniq.dev?debug=true&eruda
 ```
 
 **Filtered debug** (only specific types):
@@ -23,6 +28,11 @@ https://tribelike.shniq.dev?debug=get,peer      # Multiple types
 **Quiet mode** (no console hints):
 ```
 https://tribelike.shniq.dev?debug=true&quiet    # Debug without hints
+```
+
+**Minimal** (only specific logs, no Eruda, no hints):
+```
+https://tribelike.shniq.dev?debug=peer&quiet    # Super clean!
 ```
 
 ## Available Tools

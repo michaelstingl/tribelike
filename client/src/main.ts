@@ -12,6 +12,7 @@ import VueDnDKitPlugin from '@vue-dnd-kit/core';
 const params = new URLSearchParams(location.search);
 const debugMode = import.meta.env.DEV || params.has('debug');
 const quietMode = params.has('quiet');
+const erudaMode = params.has('eruda');
 
 if (debugMode) {
   // Load Gun.js Logger
@@ -25,8 +26,9 @@ if (debugMode) {
     }
   });
   
-  // Load Eruda (mobile-style console)
-  import('eruda').then(({ default: eruda }) => {
+  // Load Eruda only if explicitly requested
+  if (erudaMode) {
+    import('eruda').then(({ default: eruda }) => {
     eruda.init({
       container: document.body,
       tool: ['console', 'network', 'resources', 'info', 'elements'],
@@ -48,7 +50,8 @@ if (debugMode) {
       console.log('%c📱 Eruda Console loaded! Click the floating button to open.', 
         'color: #9C27B0; font-weight: bold');
     }
-  });
+    });
+  }
 }
 
 const app = createApp(App);
