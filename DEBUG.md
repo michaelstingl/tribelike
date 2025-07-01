@@ -113,6 +113,40 @@ gun.clear()  // Clears localStorage, sessionStorage, IndexedDB
 3. **Network**: Eruda's Network tab shows WebSocket connections
 4. **Storage**: Eruda's Resources tab shows Gun data in localStorage
 
+## Common Issues & Solutions
+
+### "Warning: You're syncing 1K+ records a second"
+- Too many Gun.js listeners active
+- Solution: Use `.once()` instead of `.on()` where possible
+- Or filter subscriptions to specific paths
+
+### "WebSocket is closed due to suspension"
+- Normal when tab is in background or after sleep
+- Gun.js auto-reconnects
+- Check with `gunStats()` to see connection status
+
+### "NotAllowedError" on Login
+- WebAuthn/Passkey error
+- Each domain needs its own account
+- Solution: Create new account on your domain
+
+### Plugin URLs showing localhost
+- Known issue with plugin system
+- Plugins still in development
+- Remove faulty plugins with red buttons
+
+## URL Parameters Reference
+
+```
+?debug=true         # Full debug mode
+?debug=silent       # Logger active, no console output
+?debug=peer         # Only peer logs
+?debug=get          # Only GET operations
+?debug=subscribe    # Only subscriptions
+?debug=true&eruda   # With Eruda mobile console
+?debug=peer&quiet   # Minimal output
+```
+
 ## Keyboard Shortcuts
 
 None yet - use the floating Eruda button or console commands.
