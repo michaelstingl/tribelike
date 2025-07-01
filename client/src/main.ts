@@ -8,6 +8,43 @@ import 'vue3-openlayers/styles.css';
 import OpenLayersMap from 'vue3-openlayers';
 import VueDnDKitPlugin from '@vue-dnd-kit/core';
 
+// Debug mode activation (?debug=true works in production!)
+const debugMode = import.meta.env.DEV || new URLSearchParams(location.search).has('debug');
+
+if (debugMode) {
+  // Load Gun.js Logger
+  import('./utils/gunLogger').then(({ default: gunLogger }) => {
+    console.log('Gun Logger loaded. Available commands:');
+    console.log('- gunLog.getStats()');
+    console.log('- gunLog.printStats()');
+    console.log('- gunLog.showRecent()');
+    console.log('- gunLog.clear()');
+  });
+  
+  // Load Eruda (mobile-style console)
+  import('eruda').then(({ default: eruda }) => {
+    eruda.init({
+      container: document.body,
+      tool: ['console', 'network', 'resources', 'info', 'elements'],
+      useShadowDom: true,
+      autoScale: true
+    });
+    
+    // Position bottom right
+    eruda.position({ 
+      x: window.innerWidth - 50, 
+      y: window.innerHeight - 50 
+    });
+    
+    // Start minimized
+    eruda.hide();
+    
+    // Show hint
+    console.log('%c📱 Eruda Console loaded! Click the floating button to open.', 
+      'color: #9C27B0; font-weight: bold');
+  });
+}
+
 const app = createApp(App);
 
 app.use(router);

@@ -4,12 +4,14 @@ import { defineConfig } from 'vite'
 import tailwindcss from "@tailwindcss/vite"
 import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
+import vueDevTools from 'vite-plugin-vue-devtools'
 import federation from '@originjs/vite-plugin-federation'
 
 export default defineConfig({
   plugins: [
     vue(),
     vueJsx(),
+    vueDevTools(), // Vue DevTools for development
     tailwindcss(),
     federation({
       name: 'tribelike',
