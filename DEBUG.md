@@ -12,6 +12,11 @@ Just run `pnpm dev` - all debug tools are automatically enabled!
 https://tribelike.shniq.dev?debug=true
 ```
 
+**Silent debug** (logger active but no console output):
+```
+https://tribelike.shniq.dev?debug=silent
+```
+
 **With Eruda** (mobile console):
 ```
 https://tribelike.shniq.dev?debug=true&eruda

@@ -13,6 +13,7 @@ class GunLogger {
   private maxEvents = 100;
   private enabled = false;
   private filterTypes?: string[];
+  private silentMode = false;
   
   constructor() {
     const params = new URLSearchParams(location.search);
@@ -24,7 +25,14 @@ class GunLogger {
     
     // Check for debug filters
     const debugFilter = params.get('debug');
-    if (debugFilter && debugFilter !== 'true') {
+    if (debugFilter === 'silent') {
+      // Silent mode - no console output at all
+      this.silentMode = true;
+      // Still show activation message unless quiet
+      if (!params.has('quiet')) {
+        console.log('%c🔫 Gun Logger Activated (silent mode)', 'color: #4CAF50; font-weight: bold');
+      }
+    } else if (debugFilter && debugFilter !== 'true') {
       // Filter by type: ?debug=peer or ?debug=get,subscribe
       const allowedTypes = debugFilter.toLowerCase().split(',');
       this.filterTypes = allowedTypes;
@@ -107,23 +115,26 @@ class GunLogger {
       this.events = this.events.slice(0, this.maxEvents);
     }
     
-    // Fancy console output
-    const styles = {
-      GET: 'color: #4CAF50; font-weight: bold',
-      PUT: 'color: #2196F3; font-weight: bold', 
-      PEER: 'color: #FF9800; font-weight: bold',
-      SUBSCRIBE: 'color: #9C27B0; font-weight: bold',
-      ERROR: 'color: #F44336; font-weight: bold'
-    };
-    
-    const style = styles[type as keyof typeof styles] || 'color: #9E9E9E';
-    
-    console.log(
-      `%c[Gun.${type}] %c${path}`,
-      style,
-      'color: #666',
-      meta
-    );
+    // Only log to console if not in silent mode
+    if (!this.silentMode) {
+      // Fancy console output
+      const styles = {
+        GET: 'color: #4CAF50; font-weight: bold',
+        PUT: 'color: #2196F3; font-weight: bold', 
+        PEER: 'color: #FF9800; font-weight: bold',
+        SUBSCRIBE: 'color: #9C27B0; font-weight: bold',
+        ERROR: 'color: #F44336; font-weight: bold'
+      };
+      
+      const style = styles[type as keyof typeof styles] || 'color: #9E9E9E';
+      
+      console.log(
+        `%c[Gun.${type}] %c${path}`,
+        style,
+        'color: #666',
+        meta
+      );
+    }
   }
   
   // Public methods
