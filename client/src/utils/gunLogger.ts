@@ -27,8 +27,13 @@ class GunLogger {
     // Log peer connections
     this.logPeerActivity();
     
-    // Make available globally
+    // Make available globally (for both browser console and Eruda)
     (window as any).gunLog = this;
+    
+    // Also expose individual methods for easier access
+    (window as any).gunStats = () => this.printStats();
+    (window as any).gunRecent = (count?: number) => this.showRecent(count);
+    (window as any).gunClear = () => this.clear();
   }
   
   private interceptGunMethods() {

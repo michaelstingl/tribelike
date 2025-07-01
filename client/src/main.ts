@@ -15,10 +15,10 @@ if (debugMode) {
   // Load Gun.js Logger
   import('./utils/gunLogger').then(({ default: gunLogger }) => {
     console.log('Gun Logger loaded. Available commands:');
-    console.log('- gunLog.getStats()');
-    console.log('- gunLog.printStats()');
-    console.log('- gunLog.showRecent()');
-    console.log('- gunLog.clear()');
+    console.log('- gunStats()     // Show statistics');
+    console.log('- gunRecent()    // Show recent activity');
+    console.log('- gunClear()     // Clear logs');
+    console.log('- gunLog         // Full logger object');
   });
   
   // Load Eruda (mobile-style console)

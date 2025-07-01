@@ -19,24 +19,23 @@ https://tribelike.shniq.dev?debug=true
 - Tabs: Console, Network, Resources, Info, Elements
 
 ### 2. Gun.js Logger
-Open browser console and use these commands:
+Works in both browser console AND Eruda console!
 
+**Quick commands** (easier to type):
 ```javascript
-// Show current stats
-gunLog.printStats()
+gunStats()     // Show current statistics
+gunRecent()    // Show last 10 events
+gunRecent(20)  // Show last 20 events
+gunClear()     // Clear log history
+```
 
-// Show recent Gun activity
-gunLog.showRecent()    // Last 10 events
-gunLog.showRecent(20)  // Last 20 events
-
-// Get raw stats object
-gunLog.getStats()
-
-// Clear log history
-gunLog.clear()
-
-// See all logged events
-gunLog.getEvents()
+**Full logger object**:
+```javascript
+gunLog.printStats()   // Same as gunStats()
+gunLog.showRecent()   // Same as gunRecent()
+gunLog.getStats()     // Get raw stats object
+gunLog.getEvents()    // See all logged events
+gunLog.clear()        // Same as gunClear()
 ```
 
 ### 3. Vue DevTools (Dev only)
