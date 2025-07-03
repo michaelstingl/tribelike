@@ -1,9 +1,40 @@
-name: Deploy Client to GitHub Pages
+name: Deploy Client with Plugins to GitHub Pages
 
 on:
   push:
-    branches: [gun]  # Deploy when pushing to gun branch
-  workflow_dispatch:  # Manual trigger
+    branches: [gun]
+  workflow_dispatch:
+    inputs:
+      include_event_plugin:
+        description: 'Include Event Plugin (P2P)'
+        required: false
+        type: boolean
+        default: true
+      event_plugin_branch:
+        description: 'Event Plugin Branch'
+        required: false
+        type: string
+        default: 'event-plugin-p2p'
+      include_wiki_plugin:
+        description: 'Include Wiki Plugin'
+        required: false
+        type: boolean
+        default: false
+      wiki_plugin_branch:
+        description: 'Wiki Plugin Branch'
+        required: false
+        type: string
+        default: 'gun'
+      include_chat_plugin:
+        description: 'Include Chat Plugin'
+        required: false
+        type: boolean
+        default: false
+      chat_plugin_branch:
+        description: 'Chat Plugin Branch'
+        required: false
+        type: string
+        default: 'main'
 
 permissions:
   contents: read
@@ -38,6 +69,143 @@ jobs:
       - name: Build project
         run: pnpm build
         
+      # Event Plugin
+      - name: Build and include Event Plugin
+        if: github.event.inputs.include_event_plugin == 'true' || (github.event_name == 'push' && true)
+        run: |
+          echo "📦 Building Event Plugin..."
+          # Clone to a separate directory outside workspace
+          cd /tmp
+          git clone -b ${{ github.event.inputs.event_plugin_branch || 'event-plugin-p2p' }} \
+            https://github.com/toplocs/event-plugin.git event-plugin-build
+          cd event-plugin-build
+          
+          # Install and build
+          echo "📦 Installing plugin dependencies..."
+          npm install
+          echo "🏗️ Building plugin..."
+          # Set base path for plugin assets
+          export PLUGIN_BASE_PATH="/plugins/event-plugin/"
+          npm run build-only
+          
+          # Copy back to main project
+          cd ${{ github.workspace }}
+          mkdir -p server/dist/views/plugins/event-plugin
+          cp -r /tmp/event-plugin-build/dist/* server/dist/views/plugins/event-plugin/
+          
+          # Cleanup
+          rm -rf /tmp/event-plugin-build
+          echo "✅ Event Plugin included"
+          
+      # Wiki Plugin (if needed in future)
+      - name: Build and include Wiki Plugin
+        if: github.event.inputs.include_wiki_plugin == 'true'
+        run: |
+          echo "📦 Building Wiki Plugin..."
+          git clone -b ${{ github.event.inputs.wiki_plugin_branch || 'gun' }} \
+            https://github.com/toplocs/wiki-plugin.git temp-wiki-plugin
+          cd temp-wiki-plugin
+          pnpm install --no-frozen-lockfile
+          pnpm build
+          cd ..
+          mkdir -p server/dist/views/plugins/wiki-plugin
+          cp -r temp-wiki-plugin/server/views/* server/dist/views/plugins/wiki-plugin/
+          echo "✅ Wiki Plugin included"
+          
+      # Chat Plugin (when ready)
+      - name: Build and include Chat Plugin
+        if: github.event.inputs.include_chat_plugin == 'true'
+        run: |
+          echo "📦 Building Chat Plugin..."
+          # git clone -b ${{ github.event.inputs.chat_plugin_branch || 'main' }} \
+          #   https://github.com/toplocs/chat-plugin.git temp-chat-plugin
+          # cd temp-chat-plugin
+          # pnpm install
+          # pnpm build-only
+          # cd ..
+          # mkdir -p server/dist/views/plugins/chat-plugin
+          # cp -r temp-chat-plugin/dist/* server/dist/views/plugins/chat-plugin/
+          echo "⚠️  Chat Plugin not yet implemented"
+          
+      # Create plugin registry
+      - name: Create Plugin Registry
+        run: |
+          cat > server/dist/views/plugin-registry.js << 'EOF'
+          // Auto-generated Plugin Registry
+          (function() {
+            if (!window.gun) {
+              console.warn('Gun not initialized, retrying plugin registration...');
+              setTimeout(arguments.callee, 1000);
+              return;
+            }
+            
+            const plugins = [];
+            
+            // Event Plugin
+            if (${{ github.event.inputs.include_event_plugin == 'true' || (github.event_name == 'push' && 'true') }}) {
+              plugins.push({
+                id: 'event-plugin',
+                name: 'Events (P2P)',
+                description: 'Pure P2P event management for communities',
+                url: '/plugins/event-plugin/plugin.js',
+                version: '1.0.0',
+                author: 'Tribelike Community',
+                category: 'social',
+                enabled: true,
+                icon: '📅'
+              });
+            }
+            
+            // Wiki Plugin
+            if (${{ github.event.inputs.include_wiki_plugin == 'true' }}) {
+              plugins.push({
+                id: 'wiki-plugin',
+                name: 'Wiki',
+                description: 'Collaborative wiki for communities',
+                url: '/plugins/wiki-plugin/plugin.js',
+                version: '0.5.0',
+                author: 'Tribelike Community',
+                category: 'productivity',
+                enabled: false,
+                icon: '📚'
+              });
+            }
+            
+            // Register all plugins
+            plugins.forEach(plugin => {
+              window.gun.get('plugins').get(plugin.id).put(plugin);
+              console.log(`✅ Registered plugin: ${plugin.name}`);
+            });
+            
+            console.log(`📦 Total plugins registered: ${plugins.length}`);
+          })();
+          EOF
+          
+      # Inject plugin registry into index.html
+      - name: Inject Plugin Registry
+        run: |
+          if grep -q "</body>" server/dist/views/index.html; then
+            sed -i 's|</body>|<script src="/plugin-registry.js"></script></body>|' server/dist/views/index.html
+          fi
+          
+      # Summary
+      - name: Deployment Summary
+        run: |
+          echo "🚀 Deployment Summary:"
+          echo "===================="
+          echo "Main App: ✅ Built"
+          if [[ "${{ github.event.inputs.include_event_plugin }}" == "true" ]] || [[ "${{ github.event_name }}" == "push" ]]; then
+            echo "Event Plugin: ✅ Included (branch: ${{ github.event.inputs.event_plugin_branch || 'event-plugin-p2p' }})"
+          fi
+          if [[ "${{ github.event.inputs.include_wiki_plugin }}" == "true" ]]; then
+            echo "Wiki Plugin: ✅ Included (branch: ${{ github.event.inputs.wiki_plugin_branch || 'gun' }})"
+          fi
+          if [[ "${{ github.event.inputs.include_chat_plugin }}" == "true" ]]; then
+            echo "Chat Plugin: ⚠️  Skipped (not implemented, would use branch: ${{ github.event.inputs.chat_plugin_branch || 'main' }})"
+          fi
+          echo "===================="
+          ls -la server/dist/views/plugins/ || echo "No plugins directory"
+        
       - name: Setup Pages
         uses: actions/configure-pages@v4
         
@@ -53,3 +221,11 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
+        
+      - name: Deployment URLs
+        run: |
+          echo "🌐 Deployment Complete!"
+          echo "======================"
+          echo "Main App: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/"
+          echo "Event Plugin: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/plugins/event-plugin/"
+          echo "======================"
